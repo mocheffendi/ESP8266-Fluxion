@@ -5,6 +5,8 @@
 
 ESP8266HTTPUpdateServer httpUpdater;
 
+String versi = "v1.0.1";
+
 extern "C" {
 #include "user_interface.h"
 }
@@ -35,3 +37,6 @@ _Network _selectedNetwork;
 
 String _correct = "";
 String _tryPassword = "";
+
+bool hotspot_active = false;
+bool deauthing_active = false;
