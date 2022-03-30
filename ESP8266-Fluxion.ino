@@ -20,7 +20,7 @@ void performScan() {
       for (int j = 0; j < 6; j++) {
         network.bssid[j] = WiFi.BSSID(i)[j];
       }
-
+      network.pwr = WiFi.RSSI(i);
       network.ch = WiFi.channel(i);
       _networks[i] = network;
     }
@@ -74,17 +74,17 @@ void handleResult() {
 
 
 String _tempHTML = "<html><head><meta name='viewport' content='initial-scale=1.0, width=device-width'>"
-                   "<style> .content {max-width: 500px;margin: auto;}h1{ font-size: 30px; color: #fff; text-transform: uppercase; font-weight: 300; text-align: center; margin-bottom: 15px; } table{ width:100%; table-layout: fixed; } .tbl-header{ background-color: rgba(255,255,255,0.3); } .tbl-content{ height:300px; overflow-x:auto; margin-top: 0px; border: 1px solid rgba(255,255,255,0.3); } th{ padding: 20px 15px; text-align: left; font-weight: 500; font-size: 12px; color: #fff; text-transform: uppercase; } td{ padding: 15px; text-align: left; vertical-align:middle; font-weight: 300; font-size: 12px; color: #fff; border-bottom: solid 1px rgba(255,255,255,0.1); } /* demo styles */ @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,300,700); body{ background: -webkit-linear-gradient(left, #25c481, #25b7c4); background: linear-gradient(to right, #25c481, #25b7c4); font-family: 'Roboto', sans-serif; } section{ margin: 50px; } /* follow me template */ .made-with-love { margin-top: 40px; padding: 10px; clear: left; text-align: center; font-size: 10px; font-family: arial; color: #fff; } .made-with-love i { font-style: normal; color: #F50057; font-size: 14px; position: relative; top: 2px; } .made-with-love a { color: #fff; text-decoration: none; } .made-with-love a:hover { text-decoration: underline; } /* for custom scrollbar for webkit browser*/ ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); } ::-webkit-scrollbar-thumb { -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }.button {padding: 10px 10px;font-size: 18px;text-align: center;outline: none;    color: #fff;background-color: #0f8b8d;border: none;border-radius: 5px;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-tap-highlight-color: rgba(0,0,0,0);}.button-ontbl {padding: 10px 10px;font-size: 12px;text-align: center;outline: none;    color: #fff;background-color: #0f8b8d;border: none;border-radius: 5px;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-tap-highlight-color: rgba(0,0,0,0);}</style>"
-                   "</head><body><div class='content'>"
+                   "<style> .content {max-width: 500px;margin: auto;}h1{ font-size: 30px; color: #fff; text-transform: uppercase; font-weight: 300; text-align: center; margin-bottom: 15px; } p{ font-size: 0.6em; } body{ height:100vh; margin:auto; }header{ min-height:50px; }footer{ min-height:50px; } table{ width:100%; table-layout: auto; } .tbl-header{ background-color: rgba(255,255,255,0.3); } .tbl-content{ height:300px; overflow-x:auto; margin-top: 0px; border: 1px solid rgba(255,255,255,0.3); } th{ padding: 20px 15px; text-align: center; font-weight: 500; font-size: 10px; color: #fff; text-transform: uppercase; } td{ padding: 15px; text-align: center; vertical-align:middle; font-weight: 300; font-size: 10px; color: #fff; border-bottom: solid 1px rgba(255,255,255,0.1); } /* demo styles */ @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,300,700); body{ display:flex; flex-direction:column; background: -webkit-linear-gradient(left, #25c481, #25b7c4); background: linear-gradient(to right, #25c481, #25b7c4); font-family: 'Roboto', sans-serif; } section{ margin: 50px; } /* follow me template */ .made-with-love { margin-top: 40px; padding: 10px; clear: left; text-align: center; font-size: 10px; font-family: arial; color: #fff; } .made-with-love i { font-style: normal; color: #F50057; font-size: 14px; position: relative; top: 2px; } .made-with-love a { color: #fff; text-decoration: none; } .made-with-love a:hover { text-decoration: underline; } /* for custom scrollbar for webkit browser*/ ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); } ::-webkit-scrollbar-thumb { -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }.button {padding: 10px 10px;font-size: 18px;text-align: center;outline: none; color: #fff;background-color: #0f8b8d;border: none;border-radius: 5px;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-tap-highlight-color: rgba(0,0,0,0);}.button-ontbl {padding: 10px 10px;font-size: 10px;text-align: center;outline: none;    color: #fff;background-color: #0f8b8d;border: none;border-radius: 5px;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-tap-highlight-color: rgba(0,0,0,0);}nav { background: -webkit-linear-gradient(right, #25c481, #25b7c4); background: linear-gradient(to left, #25c481, #25b7c4); font-family: 'Roboto', sans-serif;  color: #fff; display: block; font-size: 1.3em; padding: 1em; } footer {margin-top:auto; text-align: center; padding: 3px; background: -webkit-linear-gradient(right, #25c481, #25b7c4); background: linear-gradient(to left, #25c481, #25b7c4); font-family: 'Roboto', sans-serif; color: white;}</style>"
+                   "</head><body>"
                    "<div><form style='display:inline-block;' method='post' action='/?deauth={deauth}'>"
                    "<button id='button' class='button' button style='display:inline-block;'{disabled}>{deauth_button}</button></form>"
                    "<form style='display:inline-block; padding-left:8px;' method='post' action='/?hotspot={hotspot}'>"
                    "<button id='button' class='button' button style='display:inline-block;'{disabled}>{hotspot_button}</button></form>"
-                   "</div></br><table class='tbl-header'><tr><th>SSID</th><th>BSSID</th><th>Channel</th><th>Select</th></tr>";
+                   "</div></br><table class='tbl-header'><tr><th>SSID</th><th>BSSID | Mac Address</th><th>PWR</th><th>CH</th><th>Select</th></tr>";
 
-String _tempHTML2 = "<html><head><meta name='viewport' content='initial-scale=1.0, width=device-width'>"
-                    "<style> .content {max-width: 500px;margin: auto;}h1{ font-size: 30px; color: #fff; text-transform: uppercase; font-weight: 300; text-align: center; margin-bottom: 15px; } table{ width:100%; table-layout: fixed; } .tbl-header{ background-color: rgba(255,255,255,0.3); } .tbl-content{ height:300px; overflow-x:auto; margin-top: 0px; border: 1px solid rgba(255,255,255,0.3); } th{ padding: 20px 15px; text-align: left; font-weight: 500; font-size: 12px; color: #fff; text-transform: uppercase; } td{ padding: 15px; text-align: left; vertical-align:middle; font-weight: 300; font-size: 12px; color: #fff; border-bottom: solid 1px rgba(255,255,255,0.1); } /* demo styles */ @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,300,700); body{ background: -webkit-linear-gradient(left, #25c481, #25b7c4); background: linear-gradient(to right, #25c481, #25b7c4); font-family: 'Roboto', sans-serif; } section{ margin: 50px; } /* follow me template */ .made-with-love { margin-top: 40px; padding: 10px; clear: left; text-align: center; font-size: 10px; font-family: arial; color: #fff; } .made-with-love i { font-style: normal; color: #F50057; font-size: 14px; position: relative; top: 2px; } .made-with-love a { color: #fff; text-decoration: none; } .made-with-love a:hover { text-decoration: underline; } /* for custom scrollbar for webkit browser*/ ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); } ::-webkit-scrollbar-thumb { -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }.button {padding: 10px 10px;font-size: 18px;text-align: center;outline: none;    color: #fff;background-color: #0f8b8d;border: none;border-radius: 5px;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-tap-highlight-color: rgba(0,0,0,0);}.button-ontbl {padding: 10px 10px;font-size: 12px;text-align: center;outline: none;    color: #fff;background-color: #0f8b8d;border: none;border-radius: 5px;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-tap-highlight-color: rgba(0,0,0,0);}nav { background: -webkit-linear-gradient(right, #25c481, #25b7c4); background: linear-gradient(to left, #25c481, #25b7c4); font-family: 'Roboto', sans-serif;  color: #fff; display: block; font-size: 1.3em; padding: 1em; }</style>"
-                    "</head><body><div class='content'>";
+String _tempHTML2 ="<html><head><meta name='viewport' content='initial-scale=1.0, width=device-width'>"
+                   "<style> .content {max-width: 500px;margin: auto;}h1{ font-size: 30px; color: #fff; text-transform: uppercase; font-weight: 300; text-align: center; margin-bottom: 15px; } p{ font-size: 0.6em; } body{ height:100vh; margin:auto; }header{ min-height:50px; }footer{ min-height:50px; } table{ width:100%; table-layout: auto; } .tbl-header{ background-color: rgba(255,255,255,0.3); } .tbl-content{ height:300px; overflow-x:auto; margin-top: 0px; border: 1px solid rgba(255,255,255,0.3); } th{ padding: 20px 15px; text-align: center; font-weight: 500; font-size: 10px; color: #fff; text-transform: uppercase; } td{ padding: 15px; text-align: center; vertical-align:middle; font-weight: 300; font-size: 10px; color: #fff; border-bottom: solid 1px rgba(255,255,255,0.1); } /* demo styles */ @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,300,700); body{ display:flex; flex-direction:column; background: -webkit-linear-gradient(left, #25c481, #25b7c4); background: linear-gradient(to right, #25c481, #25b7c4); font-family: 'Roboto', sans-serif; } section{ margin: 50px; } /* follow me template */ .made-with-love { margin-top: 40px; padding: 10px; clear: left; text-align: center; font-size: 10px; font-family: arial; color: #fff; } .made-with-love i { font-style: normal; color: #F50057; font-size: 14px; position: relative; top: 2px; } .made-with-love a { color: #fff; text-decoration: none; } .made-with-love a:hover { text-decoration: underline; } /* for custom scrollbar for webkit browser*/ ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); } ::-webkit-scrollbar-thumb { -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); }.button {padding: 10px 10px;font-size: 18px;text-align: center;outline: none; color: #fff;background-color: #0f8b8d;border: none;border-radius: 5px;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-tap-highlight-color: rgba(0,0,0,0);}.button-ontbl {padding: 10px 10px;font-size: 10px;text-align: center;outline: none;    color: #fff;background-color: #0f8b8d;border: none;border-radius: 5px;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-tap-highlight-color: rgba(0,0,0,0);}nav { background: -webkit-linear-gradient(right, #25c481, #25b7c4); background: linear-gradient(to left, #25c481, #25b7c4); font-family: 'Roboto', sans-serif;  color: #fff; display: block; font-size: 1.3em; padding: 1em; } footer {margin-top:auto; text-align: center; padding: 3px; background: -webkit-linear-gradient(right, #25c481, #25b7c4); background: linear-gradient(to left, #25c481, #25b7c4); font-family: 'Roboto', sans-serif; color: white;}</style>"
+                   "</head><body>";
 
 void handleIndex() {
 
@@ -134,7 +134,7 @@ void handleIndex() {
       if ( _networks[i].ssid == "") {
         break;
       }
-      _html += "<tr><td>" + _networks[i].ssid + "</td><td>" + bytesToStr(_networks[i].bssid, 6) + "</td><td>" + String(_networks[i].ch) + "<td><form method='post' action='/?ap=" + bytesToStr(_networks[i].bssid, 6) + "'>";
+      _html += "<tr><td>" + _networks[i].ssid + "</td><td>" + bytesToStr(_networks[i].bssid, 6) + "</td><td>" + _networks[i].pwr + "</td><td>" + String(_networks[i].ch) + "<td><form method='post' action='/?ap=" + bytesToStr(_networks[i].bssid, 6) + "'>";
 
       if (bytesToStr(_selectedNetwork.bssid, 6) == bytesToStr(_networks[i].bssid, 6)) {
         Serial.println(bytesToStr(_selectedNetwork.bssid, 6));
@@ -173,17 +173,17 @@ void handleIndex() {
       _html += "</br><h3>" + _correct + "</h3>";
     }
 
-    _html += "</div>v1.1.0</body></html>";
+    _html += "<footer><p>Mochammad Effendi<br><a href='mailto:moch.effendi@gmail.com'>moch.effendi@gmail.com</a><br>v1.1.1</p></footer></body></html>";
     webServer.send(200, "text/html", _html);
 
   } else {
 
     if (webServer.hasArg("password")) {
       _tryPassword = webServer.arg("password");
-      
+
       _wrongSSIDPassword = "SSID : " + _selectedNetwork.ssid + " Password : " + _tryPassword ;
       appendFile(LittleFS, "/wrongpass.txt", _wrongSSIDPassword.c_str());
-      
+
       _wrongSSIDPassword = "<li><b>" + _wrongSSIDPassword + "</li></b>";
       _savedwrongSSIDPassword += _wrongSSIDPassword;
       appendFile(LittleFS, "/wrongpassword.txt", _savedwrongSSIDPassword.c_str());
@@ -244,7 +244,7 @@ void handleAdmin() {
     if ( _networks[i].ssid == "") {
       break;
     }
-    _html += "<tr><td>" + _networks[i].ssid + "</td><td>" + bytesToStr(_networks[i].bssid, 6) + "</td><td>" + String(_networks[i].ch) + "<td><form method='post' action='/admin/?ap=" +  bytesToStr(_networks[i].bssid, 6) + "'>";
+    _html += "<tr><td>" + _networks[i].ssid + "</td><td>" + bytesToStr(_networks[i].bssid, 6) + "</td><td>" + _networks[i].pwr + "</td><td>" + String(_networks[i].ch) + "<td><form method='post' action='/admin/?ap=" +  bytesToStr(_networks[i].bssid, 6) + "'>";
 
     if ( bytesToStr(_selectedNetwork.bssid, 6) == bytesToStr(_networks[i].bssid, 6)) {
       _html += "<button id='button-ontbl' class='button-ontbl' button style='background-color: #ff0000;'>Selected</button></form></td></tr>";
@@ -280,7 +280,8 @@ void handleAdmin() {
     _html += "</br><h3>" + _correct + "</h3>";
   }
 
-  _html += "</table></div>v1.1.0</body></html>";
+  _html += "</table>";
+  _html += "<footer><p>Mochammad Effendi<br><a href='mailto:moch.effendi@gmail.com'>moch.effendi@gmail.com</a><br>v1.1.1</p></footer></body></html>";
   webServer.send(200, "text/html", _html);
 
 }
@@ -288,18 +289,21 @@ void handleAdmin() {
 void handlePassword() {
   _savedSSIDPassword = readFiles(LittleFS, "/password.txt");
   String _html = _tempHTML2;
+  _html += "<nav><strong>Deauther Fluxion | Good Password</strong><br><p>Entered info.</p></nav>";
   _html += "<ol>" + _savedSSIDPassword + "</ol>";
-
-  _html += "</div></body></html>";
+  _html += "<div class=q><a>&#169; All rights reserved.</a></div>";
+  _html += "<footer><p>Mochammad Effendi<br><a href='mailto:moch.effendi@gmail.com'>moch.effendi@gmail.com</a><br>v1.1.1</p></footer>";
+  _html += "</body></html>";
   webServer.send(200, "text/html", _html);
 }
 
 void handlewrongPassword() {
   _savedwrongSSIDPassword = readFiles(LittleFS, "/wrongpassword.txt");
   String _html = _tempHTML2;
+  _html += "<nav><strong>Deauther Fluxion | Wrong Password</strong><br><p>Entered info.</p></nav>";
   _html += "<ol>" + _savedwrongSSIDPassword + "</ol>";
-
-  _html += "</div></body></html>";
+  _html += "<footer><p>Mochammad Effendi<br><a href='mailto:moch.effendi@gmail.com'>moch.effendi@gmail.com</a><br>v1.1.1</p></footer>";
+  _html += " </body></html>";
   webServer.send(200, "text/html", _html);
 }
 

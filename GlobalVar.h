@@ -13,6 +13,7 @@ extern "C" {
 typedef struct
 {
   String ssid;
+  String pwr;
   uint8_t ch;
   uint8_t bssid[6];
 }  _Network;
